@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Counterweight logo">
+  <defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#86541c"/><stop offset=".5" stop-color="#f4d17f"/><stop offset="1" stop-color="#7c4918"/></linearGradient></defs>
+  <rect width="256" height="256" rx="48" fill="#18110b"/>
+  <path d="M30 160h196v14H30zM119 90h18v72h-18z" fill="url(#g)"/>
+  <path d="M128 57l65 104H63z" fill="none" stroke="url(#g)" stroke-width="13" stroke-linejoin="round"/>
+  <circle cx="128" cy="160" r="17" fill="#1b120a" stroke="#f4d17f" stroke-width="8"/>
+  <path d="M45 119h56m54 0h56" stroke="#f4d17f" stroke-width="8"/>
+</svg>

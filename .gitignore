@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.runtime-logs/
+.chain-casino-sdk/casino-sdk/node_modules/
+.chain-casino-sdk/casino-sdk/simulator/local-node/deployed.json

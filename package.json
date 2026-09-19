@@ -1,0 +1,32 @@
+{
+  "name": "counterweight",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "test": "npm run test:engine && npm run test:rtp && npm run test:contract && npm run test:onchain && npm run test:chain-sdk",
+    "test:engine": "node --experimental-strip-types --test scripts/counterweight-engine.test.mjs",
+    "test:rtp": "node scripts/verify-rtp.mjs",
+    "test:contract": "node --experimental-strip-types --test scripts/test-contract-logic.mjs",
+    "test:onchain": "node --experimental-strip-types --test scripts/onchain-result.test.mjs",
+    "test:chain-sdk": "node --test scripts/chain-sdk-integration.test.mjs",
+    "compile:contract": "solcjs --base-path . --include-path . --bin --abi contracts/Counterweight.sol"
+  },
+  "dependencies": {
+    "@chain/casino-sdk": "file:.chain-casino-sdk/casino-sdk",
+    "penpal": "^7.0.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "viem": "^2.21.55"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "solc": "^0.8.30",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.1"
+  }
+}

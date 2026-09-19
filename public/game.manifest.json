@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "gameId": "counterweight",
+  "apiVersion": 1,
+  "defaultLocale": "en",
+  "locales": {
+    "en": {
+      "name": "Counterweight",
+      "description": "Arrange a six-crate treasure load on a mechanical balance. One VRF result reveals every weight, with three distinct risk profiles and an exact 96.00% theoretical RTP."
+    }
+  },
+  "presentation": {
+    "mode": "full-iframe",
+    "hostPanels": { "openSession": false, "history": false, "status": false }
+  },
+  "capabilities": {
+    "openSession": true,
+    "submitAction": false,
+    "forfeitExpiredSession": false,
+    "cancelStuckRandomness": false,
+    "resize": true
+  },
+  "assets": { "iconUrl": "/logo.svg" }
+}
