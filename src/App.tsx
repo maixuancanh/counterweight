@@ -71,6 +71,7 @@ export function App() {
   const [snapshot, setSnapshot] = useState<HostSnapshotV1 | null>(null);
   const [isStandalone, setIsStandalone] = useState(true);
   const [settlementError, setSettlementError] = useState<string | null>(null);
+  const [soundOn, setSoundOn] = useState(false);
   const roundRef = useRef<RoundResult | null>(null);
   const animationGuard = useRef(createAnimationGuard());
   const activeSessionKey = useRef<string | null>(null);
@@ -84,6 +85,22 @@ export function App() {
   const smoothTilt = useSpringNumber(targetTilt);
   const status = summarizeMoment(shownMoment);
   const profile = getPresetProfile(preset);
+
+  const activateAudio = () => {
+    workshopAudio.setMuted(false);
+    workshopAudio.startAmbience();
+    setSoundOn(true);
+  };
+
+  const toggleAudio = () => {
+    if (soundOn) {
+      workshopAudio.setMuted(true);
+      setSoundOn(false);
+      return;
+    }
+    activateAudio();
+    workshopAudio.select();
+  };
 
   useEffect(() => {
     animationGuard.current.start();
@@ -119,6 +136,8 @@ export function App() {
 
   const choosePreset = (next: PresetId) => {
     if (isRevealing) return;
+    activateAudio();
+    workshopAudio.select();
     setPreset(next);
     setRound(null);
     setCrates(closedCrates);
@@ -132,6 +151,15 @@ export function App() {
     setCrates(closedCrates);
     setRevealedCount(0);
     setMessage('A fresh six-crate load is ready.');
+  };
+
+  const adjustBet = (direction: 1 | -1) => {
+    if (isRevealing) return;
+    const nextBet = direction > 0 ? Math.min(visibleBalance, bet + 5) : Math.max(1, bet - 5);
+    if (nextBet === bet) return;
+    activateAudio();
+    workshopAudio.wager(direction);
+    setBet(nextBet);
   };
 
   const playRound = async (nextRound: RoundResult, sessionId?: string, roundPreset = preset) => {
@@ -195,6 +223,7 @@ export function App() {
 
   const revealLoad = async () => {
     if (isRevealing) return;
+    activateAudio();
     if (round) { resetRound(); return; }
     if (isStandalone) {
       if (bet > balance) return;
@@ -233,14 +262,19 @@ export function App() {
       <div className="grain" />
       <header className="topbar">
         <div className="brand"><span>COUNTERWEIGHT</span><small>TREASURE FINDS ITS BALANCE</small></div>
-        <div className="top-meta"><span className="demo-dot" /> {isStandalone ? 'STANDALONE DEMO' : 'CHAIN SDK CONNECTED'} <span className="rtp-chip">96.00% RTP</span><span className="balance-text">{isStandalone ? 'PLAY MONEY' : (snapshot?.token.symbol ?? 'VAULT')} <strong>{visibleBalance.toLocaleString()}</strong></span></div>
+        <div className="top-meta"><span className="demo-dot" /> {isStandalone ? 'STANDALONE DEMO' : 'CHAIN SDK CONNECTED'} <span className="rtp-chip">96.00% RTP</span><button className="sound-toggle" type="button" aria-pressed={soundOn} onClick={toggleAudio}>{soundOn ? 'SOUND ON' : 'SOUND OFF'}</button><span className="balance-text">{isStandalone ? 'PLAY MONEY' : (snapshot?.token.symbol ?? 'VAULT')} <strong>{visibleBalance.toLocaleString()}</strong></span></div>
       </header>
 
       <main className="game-grid">
         <section className="stage" aria-label="Counterweight balance game">
           <div className="workshop-copy">CRATE {Math.min(revealedCount + 1, 6)} OF 6 <span /> Will the final load balance?</div>
           <div className={`tilt-gauge ${status}`} aria-label={`Balance status: ${status}`}>
-            <span>LEFT HEAVY</span><div className="gauge-arc"><i style={{ transform: `rotate(${smoothTilt * 4.4}deg)` }} /></div><span>RIGHT HEAVY</span>
+            <span>LEFT HEAVY</span>
+            <div className="gauge-dial" aria-hidden="true">
+              <img className="gauge-face-raster" src="/assets/generated/balance-gauge-face.png" alt="" />
+              <img className="gauge-needle-raster" src="/assets/generated/balance-gauge-needle.png" alt="" style={{ transform: `translateX(-50%) rotate(${smoothTilt * 4.4}deg)` }} />
+            </div>
+            <span>RIGHT HEAVY</span>
             <b>SAFE ZONE</b>
           </div>
           <div className="scale-room">
@@ -276,7 +310,7 @@ export function App() {
           <div className="divider compact" />
           <details className="how-to"><summary>HOW TO PLAY</summary><p>Pick a layout, set a stake, then reveal six sealed crates. Finish near the center to collect its listed payout. Each layout has the same 96.00% theoretical return with a different risk profile.</p></details>
           <div className="divider compact" />
-          <div className="bet-row"><span>BET</span><div><button onClick={() => setBet(value => Math.max(1, value - 5))} disabled={isRevealing}>−</button><strong>{bet}</strong><button onClick={() => setBet(value => Math.min(visibleBalance, value + 5))} disabled={isRevealing}>+</button></div></div>
+          <div className="bet-row"><span>BET</span><div><button onClick={() => adjustBet(-1)} disabled={isRevealing}>−</button><strong>{bet}</strong><button onClick={() => adjustBet(1)} disabled={isRevealing}>+</button></div></div>
           <div className="outcome"><span>LAST PAYOUT</span><strong>{formatMultiplier(round && !isRevealing ? round.payoutMultiplier : null)}</strong><small>{round && !isRevealing ? `${Math.abs(round.finalMoment)} moment` : 'unrevealed'}</small></div>
           {settlementError && <div className="settlement-error" role="alert">{settlementError}</div>}
           <button className="reveal-button" onClick={() => void revealLoad()} disabled={isRevealing || (isStandalone && bet > balance)}>{isRevealing ? (activeSessionKey.current ? 'WAITING FOR VRF' : `REVEALING ${revealedCount}/6`) : round ? 'NEW LOAD' : 'REVEAL NEXT'}</button>
@@ -295,10 +329,7 @@ function Crate({ crate, index }: { crate: CrateReveal; index: number }) {
     <div className={`crate ${crate.revealed ? `opened ${crate.kind}` : ''}`}>
       <img className="crate-raster" src="/assets/generated/treasure-crate-closed.png" alt="" aria-hidden="true" />
       <img className="crate-open-raster" src="/assets/generated/treasure-crate-open-gold.png" alt="" aria-hidden="true" />
-      <div className="crate-lid" />
-      <div className="crate-face"><i />{crate.revealed && <span>{crate.weight}</span>}</div>
       {crate.revealed && <div className="treasure">{crate.kind === 'gems' ? '◆ ◆ ◆' : crate.kind === 'iron' ? '▰ ▰' : crate.kind === 'relic' ? '✦' : '● ● ●'}</div>}
     </div>
-    <b>{crate.id}</b>
   </div>;
 }

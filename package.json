@@ -6,12 +6,13 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "test": "npm run test:engine && npm run test:rtp && npm run test:contract && npm run test:onchain && npm run test:chain-sdk",
+    "test": "npm run test:engine && npm run test:rtp && npm run test:contract && npm run test:onchain && npm run test:chain-sdk && npm run test:audio",
     "test:engine": "node --experimental-strip-types --test scripts/counterweight-engine.test.mjs",
     "test:rtp": "node scripts/verify-rtp.mjs",
     "test:contract": "node --experimental-strip-types --test scripts/test-contract-logic.mjs",
     "test:onchain": "node --experimental-strip-types --test scripts/onchain-result.test.mjs",
     "test:chain-sdk": "node --test scripts/chain-sdk-integration.test.mjs",
+    "test:audio": "node --experimental-strip-types --test scripts/workshop-audio.test.mjs",
     "compile:contract": "solcjs --base-path . --include-path . --bin --abi contracts/Counterweight.sol"
   },
   "dependencies": {
