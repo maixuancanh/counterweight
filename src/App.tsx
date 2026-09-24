@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { encodeAbiParameters, formatUnits, parseUnits } from 'viem';
 import { PRESETS, createAnimationGuard, getPresetProfile, resolveRound, summarizeMoment, type CrateReveal, type PresetId, type RoundResult } from './engine/counterweight';
 import { decodeCounterweightState } from './engine/onChainResult';
@@ -18,6 +18,8 @@ const closedCrates: CrateReveal[] = Array.from({ length: 6 }, (_, index) => ({
   weight: 0,
   revealed: false,
 }));
+
+const generatedAsset = (name: string) => `${import.meta.env.BASE_URL}assets/generated/${name}`;
 
 function useSpringNumber(target: number) {
   const [value, setValue] = useState(target);
@@ -258,7 +260,7 @@ export function App() {
   const visibleBalance = isStandalone ? balance : Number(formatUnits(BigInt(snapshot?.balances.smartVaultBalance ?? '0'), snapshot?.token.decimals ?? 18));
 
   return (
-    <div className="game-shell">
+    <div className="game-shell" style={{ '--workshop-stage': `url('${generatedAsset('workshop-stage.png')}')` } as CSSProperties}>
       <div className="grain" />
       <header className="topbar">
         <div className="brand"><span>COUNTERWEIGHT</span><small>TREASURE FINDS ITS BALANCE</small></div>
@@ -271,19 +273,19 @@ export function App() {
           <div className={`tilt-gauge ${status}`} aria-label={`Balance status: ${status}`}>
             <span>LEFT HEAVY</span>
             <div className="gauge-dial" aria-hidden="true">
-              <img className="gauge-face-raster" src="/assets/generated/balance-gauge-face.png" alt="" />
-              <img className="gauge-needle-raster" src="/assets/generated/balance-gauge-needle.png" alt="" style={{ transform: `translateX(-50%) rotate(${smoothTilt * 4.4}deg)` }} />
+              <img className="gauge-face-raster" src={generatedAsset('balance-gauge-face.png')} alt="" />
+              <img className="gauge-needle-raster" src={generatedAsset('balance-gauge-needle.png')} alt="" style={{ transform: `translateX(-50%) rotate(${smoothTilt * 4.4}deg)` }} />
             </div>
             <span>RIGHT HEAVY</span>
             <b>SAFE ZONE</b>
           </div>
           <div className="scale-room">
             <div className="beam-wrap" style={{ transform: `rotate(${smoothTilt}deg)` }}>
-              <img className="beam-raster" src="/assets/generated/brass-scale-beam-6-slots.png" alt="" aria-hidden="true" />
+              <img className="beam-raster" src={generatedAsset('brass-scale-beam-6-slots.png')} alt="" aria-hidden="true" />
               {crates.map((crate, index) => <Crate key={crate.id} crate={crate} index={index} />)}
             </div>
             <div className="fulcrum">
-              <img className="fulcrum-base-raster" src="/assets/generated/brass-scale-base.png" alt="" aria-hidden="true" />
+              <img className="fulcrum-base-raster" src={generatedAsset('brass-scale-base.png')} alt="" aria-hidden="true" />
             </div>
           </div>
           <div className="stage-note" aria-live="polite"><span className={`status-pill ${status}`}>{status === 'balanced' ? 'IN SAFE ZONE' : status.toUpperCase()}</span> {message}</div>
@@ -327,8 +329,8 @@ function Crate({ crate, index }: { crate: CrateReveal; index: number }) {
   const positions = ['10%', '24%', '38%', '62%', '76%', '90%'];
   return <div className={`crate-slot crate-${index + 1}`} style={{ left: positions[index] }}>
     <div className={`crate ${crate.revealed ? `opened ${crate.kind}` : ''}`}>
-      <img className="crate-raster" src="/assets/generated/treasure-crate-closed.png" alt="" aria-hidden="true" />
-      <img className="crate-open-raster" src="/assets/generated/treasure-crate-open-gold.png" alt="" aria-hidden="true" />
+      <img className="crate-raster" src={generatedAsset('treasure-crate-closed.png')} alt="" aria-hidden="true" />
+      <img className="crate-open-raster" src={generatedAsset('treasure-crate-open-gold.png')} alt="" aria-hidden="true" />
       {crate.revealed && <div className="treasure">{crate.kind === 'gems' ? '◆ ◆ ◆' : crate.kind === 'iron' ? '▰ ▰' : crate.kind === 'relic' ? '✦' : '● ● ●'}</div>}
     </div>
   </div>;
